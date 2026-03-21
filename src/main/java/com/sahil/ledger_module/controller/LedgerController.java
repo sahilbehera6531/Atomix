@@ -85,12 +85,16 @@ public class LedgerController {
         return ResponseEntity.ok(history);
     }
 
-   @PostMapping("/account")
+    @Operation(summary = "Create account", description = "Creates a new account with initial balance")
+    @ApiResponse(responseCode = "200", description = "Account created successfully")
+    @PostMapping("/account")
     public ResponseEntity<String> createAccount(@Valid @RequestBody AccountRequest request) {
         ledgerService.createAccount(request.getAccountName(), request.getBalance());
         return ResponseEntity.ok("Account created successfully");
     }
 
+    @Operation(summary = "Filter transaction history", description = "Fetch transaction history filtered by type")
+    @ApiResponse(responseCode = "200", description = "Filtered transactions fetched successfully")
     @GetMapping("/history/filter")
     public ResponseEntity<List<TransactionHistory>> getFilteredHistory(
             @RequestParam Long accountId,
