@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sahil.ledger_module.dto.AccountRequest;
 import com.sahil.ledger_module.model.Account;
 import com.sahil.ledger_module.model.TransactionHistory;
+import com.sahil.ledger_module.model.TransactionType;
 import com.sahil.ledger_module.repository.AccountRepository;
 import com.sahil.ledger_module.repository.TransactionHistoryRepository;
 import com.sahil.ledger_module.service.LedgerService;
@@ -86,5 +87,15 @@ public class LedgerController {
     public ResponseEntity<String> createAccount(@RequestBody AccountRequest request) {
         ledgerService.createAccount(request.getAccountName(), request.getBalance());
         return ResponseEntity.ok("Account created successfully");
+    }
+
+    @GetMapping("/history/filter")
+    public ResponseEntity<List<TransactionHistory>> getFilteredHistory(
+            @RequestParam Long accountId,
+            @RequestParam TransactionType type) {
+
+        return ResponseEntity.ok(
+            ledgerService.getFilteredHistory(accountId, type)
+        );
     }
 }
