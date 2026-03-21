@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sahil.ledger_module.dto.AccountRequest;
 import com.sahil.ledger_module.model.Account;
 import com.sahil.ledger_module.model.TransactionHistory;
 import com.sahil.ledger_module.repository.AccountRepository;
@@ -79,5 +80,11 @@ public class LedgerController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(history);
+    }
+
+    @PostMapping("/account")
+    public ResponseEntity<String> createAccount(@RequestBody AccountRequest request) {
+        ledgerService.createAccount(request.getAccountName(), request.getBalance());
+        return ResponseEntity.ok("Account created successfully");
     }
 }
