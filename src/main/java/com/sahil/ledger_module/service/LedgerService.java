@@ -3,6 +3,8 @@ package com.sahil.ledger_module.service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +25,12 @@ public class LedgerService {
     @Autowired
     private TransactionHistoryRepository historyRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(LedgerService.class);
+
     @Transactional
     public void transferMoney(String fromAccountName, String toAccountName, BigDecimal amount) {
+
+        logger.info("Initiating transfer from {} to {} of amount {}", fromAccountName, toAccountName, amount);
         
         // CRITICAL CHANGE: Use findByAccountNameWithLock to trigger Pessimistic Locking
         Account fromAccount = accountRepository.findByAccountNameWithLock(fromAccountName)
@@ -51,6 +57,7 @@ public class LedgerService {
 
         accountRepository.save(fromAccount);
         accountRepository.save(toAccount);
+        logger.info("Transfer successful between {} and {}", fromAccountName, toAccountName);
     }
 
     public void createAccount(String name, BigDecimal balance) {
@@ -63,5 +70,7 @@ public class LedgerService {
     public List<TransactionHistory> getFilteredHistory(Long accountId, TransactionType type) {
         return historyRepository.findByAccountIdAndType(accountId, type);
     }
+
+    
 }
 
