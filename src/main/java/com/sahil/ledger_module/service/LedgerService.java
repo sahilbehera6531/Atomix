@@ -1,6 +1,7 @@
 package com.sahil.ledger_module.service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,6 +58,10 @@ public class LedgerService {
         account.setAccountName(name);
         account.setBalance(balance);
         accountRepository.save(account);
+    }
+
+    public List<TransactionHistory> getFilteredHistory(Long accountId, TransactionType type) {
+        return historyRepository.findByAccountIdAndType(accountId, type);
     }
 }
 
