@@ -51,4 +51,12 @@ public class LedgerService {
         accountRepository.save(fromAccount);
         accountRepository.save(toAccount);
     }
+
+    public void createAccount(String name, BigDecimal balance) {
+        Account account = new Account();
+        account.setAccountName(name);
+        account.setBalance(balance);
+        accountRepository.save(account);
+    }
 }
+
