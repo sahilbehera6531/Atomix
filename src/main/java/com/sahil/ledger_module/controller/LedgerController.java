@@ -26,6 +26,8 @@ import com.sahil.ledger_module.service.ValidationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/api/ledger")
@@ -83,8 +85,8 @@ public class LedgerController {
         return ResponseEntity.ok(history);
     }
 
-    @PostMapping("/account")
-    public ResponseEntity<String> createAccount(@RequestBody AccountRequest request) {
+   @PostMapping("/account")
+    public ResponseEntity<String> createAccount(@Valid @RequestBody AccountRequest request) {
         ledgerService.createAccount(request.getAccountName(), request.getBalance());
         return ResponseEntity.ok("Account created successfully");
     }
