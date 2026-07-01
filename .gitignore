@@ -34,3 +34,6 @@ build/
 
 ### Postgre password ###
 .env
+
+### to avoid sending db password and other sensitive info to github ###
+src/main/resources/application-local.properties
