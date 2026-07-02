@@ -38,11 +38,16 @@ import jakarta.validation.Valid;
 @Tag(name = "Ledger Management", description = "Operations for validating transactions and transferring funds")
 public class LedgerController {
 
-    @Autowired
-    private ValidationService validationService;
+    private final ValidationService validationService;
 
-    @Autowired
-    private LedgerService ledgerService;
+    private final LedgerService ledgerService;
+
+    public LedgerController(ValidationService validationService,
+                            LedgerService ledgerService) {
+
+        this.validationService = validationService;
+        this.ledgerService = ledgerService;
+    }
 
     @Operation(summary = "Validate Double-Entry", description = "Checks if the sum of debits and credits equals zero")
     @ApiResponse(responseCode = "200", description = "Transaction is balanced")

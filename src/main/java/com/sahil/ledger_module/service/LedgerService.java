@@ -28,11 +28,16 @@ import com.sahil.ledger_module.dto.TransactionHistoryResponse;
 public class LedgerService {
     
 
-    @Autowired
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
 
-    @Autowired
-    private TransactionHistoryRepository historyRepository;
+    private final TransactionHistoryRepository historyRepository;
+
+    public LedgerService(AccountRepository accountRepository,
+                        TransactionHistoryRepository historyRepository) {
+
+        this.accountRepository = accountRepository;
+        this.historyRepository = historyRepository;
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(LedgerService.class);
 
