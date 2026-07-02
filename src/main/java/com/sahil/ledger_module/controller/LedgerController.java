@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -94,7 +95,9 @@ public class LedgerController {
     @PostMapping("/account")
     public ResponseEntity<String> createAccount(@Valid @RequestBody AccountRequest request) {
         ledgerService.createAccount(request.getAccountName(), request.getBalance());
-        return ResponseEntity.ok("Account created successfully");
+        return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body("Account created successfully");
     }
 
     @Operation(summary = "Filter transaction history", description = "Fetch transaction history filtered by type")

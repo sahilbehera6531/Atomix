@@ -13,8 +13,11 @@ import com.sahil.ledger_module.repository.AccountRepository;
 @Service
 public class ValidationService {
 
-    @Autowired
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
+
+    public ValidationService(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
+    }
 
     @Transactional
     public void validateTransaction(Map<String, BigDecimal> entries) { // Changed Double to BigDecimal
