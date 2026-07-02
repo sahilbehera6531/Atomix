@@ -22,6 +22,7 @@ import com.sahil.ledger_module.repository.TransactionHistoryRepository;
 import com.sahil.ledger_module.dto.AccountResponse;
 import com.sahil.ledger_module.dto.TransactionHistoryResponse;
 
+import com.sahil.ledger_module.exception.AccountNotFoundException;
 
 
 @Service
@@ -48,10 +49,10 @@ public class LedgerService {
         
         // CRITICAL CHANGE: Use findByAccountNameWithLock to trigger Pessimistic Locking
         Account fromAccount = accountRepository.findByAccountNameWithLock(fromAccountName)
-                .orElseThrow(() -> new RuntimeException("Sender not found"));
+            .orElseThrow(() -> new AccountNotFoundException(fromAccountName));
         
         Account toAccount = accountRepository.findByAccountNameWithLock(toAccountName)
-                .orElseThrow(() -> new RuntimeException("Receiver not found"));
+            .orElseThrow(() -> new AccountNotFoundException(toAccountName));
 
         if (fromAccount.getBalance().compareTo(amount) < 0) {
             throw new InsufficientFundsException("Insufficient funds for account: " + fromAccountName);
@@ -98,7 +99,7 @@ public class LedgerService {
     public AccountResponse getAccount(String accountName) {
 
         Account account = accountRepository.findByAccountName(accountName)
-                .orElseThrow(() -> new RuntimeException("Account not found"));
+            .orElseThrow(() -> new AccountNotFoundException(accountName));
 
         return new AccountResponse(
                 account.getId(),
