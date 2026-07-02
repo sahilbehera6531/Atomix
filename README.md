@@ -1,4 +1,4 @@
-# Atomix — Distributed Ledger Module
+# Atomix — Transaction Ledger System
 
 ---
 
