@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -45,7 +44,12 @@ public class LedgerService {
     @Transactional
     public void transferMoney(String fromAccountName, String toAccountName, BigDecimal amount) {
 
-        logger.info("Initiating transfer from {} to {} of amount {}", fromAccountName, toAccountName, amount);
+        logger.info(
+            "Transfer request received | from={} | to={} | amount={}",
+            fromAccountName,
+            toAccountName,
+            amount
+    );
         
         // CRITICAL CHANGE: Use findByAccountNameWithLock to trigger Pessimistic Locking
         Account fromAccount = accountRepository.findByAccountNameWithLock(fromAccountName)
@@ -54,9 +58,20 @@ public class LedgerService {
         Account toAccount = accountRepository.findByAccountNameWithLock(toAccountName)
             .orElseThrow(() -> new AccountNotFoundException(toAccountName));
 
+            
         if (fromAccount.getBalance().compareTo(amount) < 0) {
-            throw new InsufficientFundsException("Insufficient funds for account: " + fromAccountName);
-        }
+
+        logger.warn(
+                "Transfer rejected | account={} | availableBalance={} | requestedAmount={}",
+                fromAccountName,
+                fromAccount.getBalance(),
+                amount
+        );
+
+        throw new InsufficientFundsException(
+                "Insufficient funds for account: " + fromAccountName
+        );
+    }
 
         fromAccount.setBalance(fromAccount.getBalance().subtract(amount));
         toAccount.setBalance(toAccount.getBalance().add(amount));
@@ -72,12 +87,22 @@ public class LedgerService {
 
         accountRepository.save(fromAccount);
         accountRepository.save(toAccount);
-        logger.info("Transfer successful between {} and {}", fromAccountName, toAccountName);
+        logger.info(
+            "Transfer completed successfully | from={} | to={} | amount={}",
+            fromAccountName,
+            toAccountName,
+            amount
+    );
     }
 
    public void createAccount(String name, BigDecimal balance) {
 
         if (accountRepository.findByAccountName(name).isPresent()) {
+            logger.warn(
+                "Duplicate account creation attempted | account={}",
+                name
+            );
+            
             throw new DuplicateAccountException(name);
         }
 
@@ -86,6 +111,11 @@ public class LedgerService {
         account.setBalance(balance);
 
         accountRepository.save(account);
+        logger.info(
+            "Account created successfully | account={} | balance={}",
+            name,
+            balance
+        );
     }
 
     public List<TransactionHistoryResponse> getFilteredHistory(Long accountId, TransactionType type) {
