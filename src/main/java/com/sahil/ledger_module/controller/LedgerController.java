@@ -20,8 +20,6 @@ import com.sahil.ledger_module.dto.AccountRequest;
 import com.sahil.ledger_module.model.Account;
 import com.sahil.ledger_module.model.TransactionHistory;
 import com.sahil.ledger_module.model.TransactionType;
-import com.sahil.ledger_module.repository.AccountRepository;
-import com.sahil.ledger_module.repository.TransactionHistoryRepository;
 import com.sahil.ledger_module.service.LedgerService;
 import com.sahil.ledger_module.service.ValidationService;
 
@@ -41,12 +39,6 @@ public class LedgerController {
 
     @Autowired
     private LedgerService ledgerService;
-
-    @Autowired
-    private AccountRepository accountRepository;
-
-    @Autowired
-    private TransactionHistoryRepository historyRepository;
 
     @Operation(summary = "Validate Double-Entry", description = "Checks if the sum of debits and credits equals zero")
     @ApiResponse(responseCode = "200", description = "Transaction is balanced")
@@ -69,21 +61,18 @@ public class LedgerController {
     @Operation(summary = "Get Account Details", description = "Fetch the current balance for a specific account name")
     @GetMapping("/account/{name}")
     public ResponseEntity<Account> getAccount(@PathVariable String name) {
-        // Uses the NON-LOCKING method for better performance
-        return accountRepository.findByAccountName(name)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(ledgerService.getAccount(name));
     }
 
     @Operation(summary = "Get Transaction History", description = "Fetch all debit/credit records for an account ID")
     @GetMapping("/history/{accountId}")
     public ResponseEntity<List<TransactionHistory>> getHistory(@PathVariable Long accountId) {
-        List<TransactionHistory> history = historyRepository.findByAccountId(accountId);
-        
-        // Correctly returns 404 if the list is empty
+        List<TransactionHistory> history = ledgerService.getHistory(accountId);
+
         if (history.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+
         return ResponseEntity.ok(history);
     }
 

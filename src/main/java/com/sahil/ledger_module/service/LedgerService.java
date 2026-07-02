@@ -77,5 +77,13 @@ public class LedgerService {
         return historyRepository.findByAccountId(accountId, pageable);
     }
     
+    public Account getAccount(String accountName) {
+    return accountRepository.findByAccountName(accountName)
+            .orElseThrow(() -> new RuntimeException("Account not found"));
+}
+
+    public List<TransactionHistory> getHistory(Long accountId) {
+        return historyRepository.findByAccountId(accountId);
+    }
 }
 
