@@ -2,6 +2,7 @@ package com.sahil.ledger_module.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +19,14 @@ import com.sahil.ledger_module.model.TransactionType;
 import com.sahil.ledger_module.repository.AccountRepository;
 import com.sahil.ledger_module.repository.TransactionHistoryRepository;
 
+import com.sahil.ledger_module.dto.AccountResponse;
+import com.sahil.ledger_module.dto.TransactionHistoryResponse;
+
+
+
 @Service
 public class LedgerService {
+    
 
     @Autowired
     private AccountRepository accountRepository;
@@ -69,21 +76,49 @@ public class LedgerService {
         accountRepository.save(account);
     }
 
-    public List<TransactionHistory> getFilteredHistory(Long accountId, TransactionType type) {
-        return historyRepository.findByAccountIdAndType(accountId, type);
+    public List<TransactionHistoryResponse> getFilteredHistory(Long accountId, TransactionType type) {
+
+        return historyRepository.findByAccountIdAndType(accountId, type)
+                .stream()
+                .map(this::mapToTransactionHistoryResponse)
+                .collect(Collectors.toList());
     }
 
-    public Page<TransactionHistory> getPaginatedHistory(Long accountId, Pageable pageable) {
-        return historyRepository.findByAccountId(accountId, pageable);
+    public Page<TransactionHistoryResponse> getPaginatedHistory(Long accountId, Pageable pageable) {
+
+        return historyRepository.findByAccountId(accountId, pageable)
+                .map(this::mapToTransactionHistoryResponse);
     }
     
-    public Account getAccount(String accountName) {
-    return accountRepository.findByAccountName(accountName)
-            .orElseThrow(() -> new RuntimeException("Account not found"));
-}
+    public AccountResponse getAccount(String accountName) {
 
-    public List<TransactionHistory> getHistory(Long accountId) {
-        return historyRepository.findByAccountId(accountId);
+        Account account = accountRepository.findByAccountName(accountName)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+
+        return new AccountResponse(
+                account.getId(),
+                account.getAccountName(),
+                account.getBalance()
+        );
     }
+
+    public List<TransactionHistoryResponse> getHistory(Long accountId) {
+
+        return historyRepository.findByAccountId(accountId)
+                .stream()
+                .map(this::mapToTransactionHistoryResponse)
+                .collect(Collectors.toList());
+    }
+
+    private TransactionHistoryResponse mapToTransactionHistoryResponse(TransactionHistory history) {
+
+        return new TransactionHistoryResponse(
+                history.getId(),
+                history.getAmount(),
+                history.getType(),
+                history.getDescription(),
+                history.getCreatedAt()
+        );
+}
 }
 

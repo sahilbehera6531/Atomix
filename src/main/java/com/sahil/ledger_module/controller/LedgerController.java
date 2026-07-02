@@ -22,11 +22,15 @@ import com.sahil.ledger_module.model.TransactionHistory;
 import com.sahil.ledger_module.model.TransactionType;
 import com.sahil.ledger_module.service.LedgerService;
 import com.sahil.ledger_module.service.ValidationService;
+import com.sahil.ledger_module.dto.AccountResponse;
+import com.sahil.ledger_module.dto.TransactionHistoryResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+
+
 
 
 @RestController
@@ -60,14 +64,18 @@ public class LedgerController {
 
     @Operation(summary = "Get Account Details", description = "Fetch the current balance for a specific account name")
     @GetMapping("/account/{name}")
-    public ResponseEntity<Account> getAccount(@PathVariable String name) {
-        return ResponseEntity.ok(ledgerService.getAccount(name));
+    public ResponseEntity<AccountResponse> getAccount(@PathVariable String name) {
+
+        return ResponseEntity.ok(
+                ledgerService.getAccount(name)
+        );
     }
 
     @Operation(summary = "Get Transaction History", description = "Fetch all debit/credit records for an account ID")
     @GetMapping("/history/{accountId}")
-    public ResponseEntity<List<TransactionHistory>> getHistory(@PathVariable Long accountId) {
-        List<TransactionHistory> history = ledgerService.getHistory(accountId);
+    public ResponseEntity<List<TransactionHistoryResponse>> getHistory(@PathVariable Long accountId) {
+
+        List<TransactionHistoryResponse> history = ledgerService.getHistory(accountId);
 
         if (history.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -87,24 +95,24 @@ public class LedgerController {
     @Operation(summary = "Filter transaction history", description = "Fetch transaction history filtered by type")
     @ApiResponse(responseCode = "200", description = "Filtered transactions fetched successfully")
     @GetMapping("/history/filter")
-    public ResponseEntity<List<TransactionHistory>> getFilteredHistory(
+    public ResponseEntity<List<TransactionHistoryResponse>> getFilteredHistory(
             @RequestParam Long accountId,
             @RequestParam TransactionType type) {
 
         return ResponseEntity.ok(
-            ledgerService.getFilteredHistory(accountId, type)
+                ledgerService.getFilteredHistory(accountId, type)
         );
     }
 
-    @Operation(summary = "Paginated transaction history", description = "Fetch transaction history with pagination support")
+   @Operation(summary = "Paginated transaction history", description = "Fetch transaction history with pagination support")
     @ApiResponse(responseCode = "200", description = "Paginated data fetched successfully")
     @GetMapping("/history/page")
-    public ResponseEntity<Page<TransactionHistory>> getPaginatedHistory(
+    public ResponseEntity<Page<TransactionHistoryResponse>> getPaginatedHistory(
             @RequestParam Long accountId,
             Pageable pageable) {
 
         return ResponseEntity.ok(
-            ledgerService.getPaginatedHistory(accountId, pageable)
+                ledgerService.getPaginatedHistory(accountId, pageable)
         );
     }
 }
