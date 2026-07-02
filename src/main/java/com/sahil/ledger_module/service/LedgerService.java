@@ -23,7 +23,7 @@ import com.sahil.ledger_module.dto.AccountResponse;
 import com.sahil.ledger_module.dto.TransactionHistoryResponse;
 
 import com.sahil.ledger_module.exception.AccountNotFoundException;
-
+import com.sahil.ledger_module.exception.DuplicateAccountException;
 
 @Service
 public class LedgerService {
@@ -75,10 +75,16 @@ public class LedgerService {
         logger.info("Transfer successful between {} and {}", fromAccountName, toAccountName);
     }
 
-    public void createAccount(String name, BigDecimal balance) {
+   public void createAccount(String name, BigDecimal balance) {
+
+        if (accountRepository.findByAccountName(name).isPresent()) {
+            throw new DuplicateAccountException(name);
+        }
+
         Account account = new Account();
         account.setAccountName(name);
         account.setBalance(balance);
+
         accountRepository.save(account);
     }
 
