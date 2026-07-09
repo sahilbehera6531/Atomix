@@ -213,12 +213,11 @@ http://localhost:8080/swagger-ui/index.html
 
 ## 🚀 Future Scope
 
-* Redis-based caching
-* Docker containerization
-* GitHub Actions CI/CD
-* JWT Authentication
-* Kafka Event Streaming
-* Metrics & Monitoring
+* JWT Authentication & Role-Based Authorization
+* Redis-based Caching for Frequently Accessed Data
+* Microservice-based Architecture using Spring Cloud
+* Inter-service Communication using WebClient
+* Enhanced Monitoring & Application Metrics
 
 ---
 
